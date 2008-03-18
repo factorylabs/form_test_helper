@@ -15,6 +15,8 @@ module FormTestHelper
     include TagProxy
     attr_reader :tag
     
+    REMOTE_FORM_ONSUBMIT_ACTION_RGX = /new Ajax.Request\('([^']+)'/
+    
     def initialize(tag, testcase, options={})
       @tag, @testcase = tag, testcase, 
       @submit_value = options.delete(:submit_value)
@@ -24,10 +26,18 @@ module FormTestHelper
     def xhr?
       @xhr
     end
-    
+
     # If you submit the form with JavaScript
     def submit_without_clicking_button
-      path = self.action.blank? ? self.uri : self.action # If no action attribute on form, it submits to the same URI where the form was displayed
+      if xhr?
+        if tag.attributes['onsubmit'] =~ REMOTE_FORM_ONSUBMIT_ACTION_RGX
+          path = $1
+        else
+          raise "No path found for the remote request"
+        end
+      else
+        path = self.action.blank? ? self.uri : self.action # If no action attribute on form, it submits to the same URI where the form was displayed
+      end
       params = {}
       fields.each {|field| params[field.name] = field.value unless field.value.nil? || field.value == [] || params[field.name] } # don't submit the nils, empty arrays, and fields already named
       

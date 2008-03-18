@@ -62,13 +62,13 @@ end
 module XHRHelpers
   def render_for_xhr
     render_rhtml <<-EOD
-      <% form_remote_tag :url => {:action => 'create'} do -%>
+      <% form_remote_tag :url => {:action => 'create'}, :html => { :action => "/test/edit" }  do -%>
         <%= text_field_tag "username", "jason" %>
         <%= submit_tag %>
       <% end -%>
     EOD
   end
-
+  
   def check_xhr_responses(new_value)
     assert_response :success
     assert_match 'xhr', @response.body

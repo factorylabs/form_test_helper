@@ -317,5 +317,5 @@ class SubmitFormTest < Test::Unit::TestCase
     assert_equal value, @controller.params[:username]
     assert_equal({"commit"=>"maybe", "username"=>value, "action"=>"create", "controller"=>@controller.controller_name}, @controller.params)
   end
-  
+    
 end
