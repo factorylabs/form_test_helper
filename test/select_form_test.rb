@@ -588,9 +588,10 @@ class SelectFormTest < Test::Unit::TestCase
       </form>
     EOD
     new_value = 'brent'
-    select_form do |form|
+    f = select_form do |form|
       form['username'] = new_value
     end
+    f.submit
     assert_response :success
     assert_equal new_value, @controller.params[:username]
   end

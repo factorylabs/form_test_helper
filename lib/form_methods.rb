@@ -58,7 +58,6 @@ module FormTestHelper
       returning Form.new(forms.first, self, :submit_value => submit_value, :xhr => xhr ) do |form|
         if block_given?
           yield form
-          form.submit
         end
       end
     end
@@ -73,7 +72,7 @@ module FormTestHelper
     #   end
     def submit_form(*args, &block)
       if block_given?
-        select_form(*args, &block)
+        select_form(*args, &block).submit
       else
         options = args.extract_options!
         selector = args.empty? ? nil : args
