@@ -7,7 +7,8 @@ module FormTestHelper
     #
     # When given a block the form object will be passed into the
     # the block which can be used to set values on the form. The
-    # block will automatically submit the form.
+    # block will NOT submit the form. To submit the form you must
+    # call submit on ther returned form.
     #
     # === Options
     #  * xhr - can be true or false. This sets the type of request to be
