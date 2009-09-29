@@ -42,7 +42,7 @@ module FormTestHelper
       fields.each {|field| params[field.name] = field.value unless field.value.nil? || field.value == [] || params[field.name] } # don't submit the nils, empty arrays, and fields already named
       
       # Convert arrays and hashes in param keys, since test processing doesn't do this automatically
-      params = ActionController::UrlEncodedPairParser.new(params).result
+      params = UrlEncodedPairParser.new(params).result # Rack::Auth::Digest::Params[ *params.map.flatten ]
       @testcase.make_request(request_method, path, params, self.uri, @xhr)
     end
     
@@ -71,7 +71,10 @@ module FormTestHelper
       return @fields if @fields
       # Input, textarea, select, and button are valid field tags.  Name is a required attribute.
       fields = tag.select('input, textarea, select, button').reject{ |tag| tag['name'].nil? }
-      @fields = fields.group_by {|field_tag| field_tag['name'] }.collect do |name, field_tags|
+      @fields = fields.group_by {|field_tag| field_tag['name'] }.collect do |name, tags|
+        
+        field_tags = tags.reject { |f| (f['type'] == 'hidden') && (tags.size > 1) }
+        
         case field_tags.first['type']
         when 'submit'
           field_tags.reject!{ |tag,*| tag['value'] != @submit_value } if @submit_value
@@ -97,8 +100,8 @@ module FormTestHelper
     end
     
     def fields_hash
-      @fields_hash ||= FieldsHash.new(ActionController::UrlEncodedPairParser.new(fields.collect {|field| [field.name, field] }).result)
-    end
+      @fields_hash ||= FieldsHash.new(UrlEncodedPairParser.new(fields.collect {|field| [field.name, field] }).result) # Rack::Auth::Digest::Params[ *(fields.collect {|field| [field.name, field] }.flatten) ]
+    end                                                                                                          
     
     # Accepts a block that can work with a single object (group of fields corresponding to a 
     # single ActiveRecord object)
